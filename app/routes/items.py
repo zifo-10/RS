@@ -18,7 +18,7 @@ async def create_item(item: Item) -> Dict[str, str]:
 
 
 @router.get("/items/{item_id}")
-async def get_item(item_id: PyObjectId) -> Dict[str, GetItem]:
+async def get_item(item_id: PyObjectId) -> GetItem:
     # Get item from MongoDB
     item = insert_service().get_item(item_id)
-    return {"item": item}
+    return item
