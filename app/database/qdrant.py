@@ -40,8 +40,13 @@ class VectorDBClient:
             search_params=models.SearchParams(exact=True),
             score_threshold=0.0
         )
+        # Sort results by the score in descending order
+        sorted_results = sorted(results, key=lambda x: x.score, reverse=True)
+
         ids_list = []
-        for result in results:
+        for result in sorted_results:
             mongo_id = result.model_dump()['payload']['id']
             ids_list.append(mongo_id)
-        return list(set(ids_list))
+
+        return ids_list
+

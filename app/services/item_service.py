@@ -1,4 +1,5 @@
 from bson import ObjectId
+from typing_extensions import Dict
 
 from app.core.embed import CohereClient
 from app.database.mongo import Mongo

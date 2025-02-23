@@ -1,9 +1,11 @@
 # app/routes/items.py
+from typing import Dict
+
 from fastapi import APIRouter
 from pyobjectID import PyObjectId
 
 from app.dependencies import insert_service
-from app.models.item import Item
+from app.models.item import Item, GetItem
 
 router = APIRouter()
 
@@ -16,7 +18,7 @@ async def create_item(item: Item):
 
 
 @router.get("/items/{item_id}")
-async def get_item(item_id: PyObjectId):
+async def get_item(item_id: PyObjectId) -> Dict[str, GetItem]:
     # Get item from MongoDB
     item = insert_service().get_item(item_id)
     return {"item": item}

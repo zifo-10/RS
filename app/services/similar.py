@@ -1,11 +1,11 @@
 from bson import ObjectId
 
+from app.core.embed import CohereClient
+from app.core.web_search import WebSearch
 from app.database.mongo import Mongo
 from app.database.qdrant import VectorDBClient
 from app.models.item import GetItem
 from app.models.similarity_search import SimilaritySearch
-from app.core.embed import CohereClient
-from app.core.web_search import WebSearch
 
 
 class SimilarService:
@@ -52,7 +52,12 @@ class SimilarService:
                                                     collection_name="items",
                                                     top_k=query.limit,
                                                     filters=query.filters)
-        return search_vector
+        search_result = []
+        for item in search_vector:
+            item = GetItem(**self.mongo.find_one(collection="items", query={"_id": ObjectId(item)})).model_dump()
+            item["image_path"] = f"static/{item['name']}.jpg"
+            search_result.append(item)
+        return search_result
 
     def web_search(self, item_id: ObjectId):
         item = GetItem(**self.mongo.find_one(collection="items", query={"_id": item_id}))
