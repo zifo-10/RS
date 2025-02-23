@@ -32,8 +32,8 @@ class SimilarService:
             # Step 5: Sort by frequency (most frequently bought together items first)
             {"$sort": {"count": -1}},
 
-            # Step 6: Limit results (optional, e.g., top 5)
-            {"$limit": 5}
+            # Step 6: Limit results to top 10 (if available)
+            {"$limit": 10}
         ]
 
         # Run the aggregation
@@ -43,7 +43,9 @@ class SimilarService:
         for item in related_items:
             item_detail = self.mongo.find_one(collection="items", query={"_id": ObjectId(item["_id"])})
             item_detail["image_path"] = f"static/{item_detail['name']}.jpg"
-            items_details.append({"item": GetItem(**item_detail), "count": item["count"]})
+            # Append item details
+            items_details.append({"item": GetItem(**item_detail)})
+
         return items_details
 
     def search(self, query: SimilaritySearch) -> list[GetItem]:
