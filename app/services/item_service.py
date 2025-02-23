@@ -24,18 +24,29 @@ class InsertService:
         """
         # Insert the data into the database
         result = self.mongo.insert(collection="items", data=data.model_dump())
-        embedding = self.cohere.embed_text(texts=[data.description],
-                                           model="embed-multilingual-light-v3.0",
-                                           input_type="search_query",
-                                           embedding_types=["float"])
+        embedding_ar = self.cohere.embed_text(texts=[data.description_ar],
+                                              model="embed-multilingual-light-v3.0",
+                                              input_type="search_query",
+                                              embedding_types=["float"])
+        embedding_en = self.cohere.embed_text(texts=[data.description_en],
+                                              model="embed-multilingual-light-v3.0",
+                                              input_type="search_query",
+                                              embedding_types=["float"])
         # Insert the vector into the vector database
-        self.vectordb.insert_vector(vector=embedding,
+        self.vectordb.insert_vector(vector=embedding_ar,
                                     payload={"id": str(result.inserted_id),
                                              "color": data.color,
                                              "material": data.material,
                                              "category": data.category,
                                              "price": data.price},
-                                    collection_name="items")
+                                    collection_name="items_ar")
+        self.vectordb.insert_vector(vector=embedding_en,
+                                    payload={"id": str(result.inserted_id),
+                                             "color": data.color,
+                                             "material": data.material,
+                                             "category": data.category,
+                                             "price": data.price},
+                                    collection_name="items_en")
         return str(result.inserted_id)
 
     def get_item(self, item_id: ObjectId) -> GetItem:

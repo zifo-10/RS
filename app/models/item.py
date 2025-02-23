@@ -4,7 +4,8 @@ from pyobjectID import MongoObjectId
 
 class Item(BaseModel):
     name: str
-    description: str
+    description_ar: str
+    description_en: str
     color: str
     price: float
     material: str

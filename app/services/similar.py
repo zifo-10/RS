@@ -49,7 +49,7 @@ class SimilarService:
         return items_details
 
     def search(self, query: SimilaritySearch) -> list[GetItem]:
-        # Define the search query
+        # Define the search query embedding
         embedding = self.cohere.embed_text(
             texts=[query.query],
             model="embed-multilingual-light-v3.0",
@@ -57,16 +57,23 @@ class SimilarService:
             embedding_types=["float"]
         )
 
+        # Detect language of the query and select the collection accordingly
+        if '\u0600' <= query.query[0] <= '\u06FF' or '\u0750' <= query.query[0] <= '\u077F' or '\u08A0' <= query.query[
+            0] <= '\u08FF':
+            collection_name = "items_ar"
+        else:
+            collection_name = "items_en"
+
         # Perform the search to get the sorted vector IDs
         search_vector = self.vectordb.search_vector(
             query_vector=embedding,
-            collection_name="items",
+            collection_name=collection_name,
             top_k=query.limit,
             filters=query.filters,
             score_threshold=query.score_threshold
         )
 
-        # Extract IDs from search_vector in the sorted order
+        # Extract and prepare IDs from search_vector in the sorted order
         ids_to_search = [ObjectId(item) for item in search_vector]
 
         # Fetch the items from MongoDB in bulk using $in to get the documents
@@ -77,10 +84,10 @@ class SimilarService:
 
         # Prepare the result list, preserving the order of search_vector
         search_result = [
-            GetItem(**items_dict[str(ObjectId(item))],
-                    image_path=f"static/{items_dict[str(ObjectId(item))]['name']}.jpg")
+            GetItem(**items_dict[str(item)],
+                    image_path=f"static/{items_dict[str(item)]['name']}.jpg")
             for item in search_vector
-            if str(ObjectId(item)) in items_dict  # Only add if item exists in MongoDB
+            if str(item) in items_dict  # Only add if item exists in MongoDB
         ]
 
         return search_result
