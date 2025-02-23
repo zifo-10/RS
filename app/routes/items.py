@@ -1,7 +1,7 @@
 # app/routes/items.py
 from typing import Dict
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pyobjectID import PyObjectId
 
 from app.dependencies import insert_service

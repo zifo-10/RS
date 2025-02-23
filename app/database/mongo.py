@@ -15,3 +15,6 @@ class Mongo:
 
     def find_one(self, collection: str, query: dict) -> dict:
         return self.db[collection].find_one(query)
+
+    def find_many(self, collection: str, query: dict) -> list:
+        return list(self.db[collection].find(query))

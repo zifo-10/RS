@@ -48,20 +48,39 @@ class SimilarService:
 
     def search(self, query: SimilaritySearch) -> list[GetItem]:
         # Define the search query
-        embedding = self.cohere.embed_text(texts=[query.query],
-                                           model="embed-multilingual-light-v3.0",
-                                           input_type="search_query",
-                                           embedding_types=["float"])
-        search_vector = self.vectordb.search_vector(query_vector=embedding,
-                                                    collection_name="items",
-                                                    top_k=query.limit,
-                                                    filters=query.filters,
-                                                    score_threshold=query.score_threshold)
-        search_result = []
-        for item in search_vector:
-            item = self.mongo.find_one(collection="items", query={"_id": ObjectId(item)})
-            item["image_path"] = f"static/{item['name']}.jpg"
-            search_result.append(GetItem(**item))
+        embedding = self.cohere.embed_text(
+            texts=[query.query],
+            model="embed-multilingual-light-v3.0",
+            input_type="search_query",
+            embedding_types=["float"]
+        )
+
+        # Perform the search to get the sorted vector IDs
+        search_vector = self.vectordb.search_vector(
+            query_vector=embedding,
+            collection_name="items",
+            top_k=query.limit,
+            filters=query.filters,
+            score_threshold=query.score_threshold
+        )
+
+        # Extract IDs from search_vector in the sorted order
+        ids_to_search = [ObjectId(item) for item in search_vector]
+
+        # Fetch the items from MongoDB in bulk using $in to get the documents
+        items = self.mongo.find_many(collection="items", query={"_id": {"$in": ids_to_search}})
+
+        # Create a dictionary to map Mongo documents by their _id for quick access
+        items_dict = {str(item["_id"]): item for item in items}
+
+        # Prepare the result list, preserving the order of search_vector
+        search_result = [
+            GetItem(**items_dict[str(ObjectId(item))],
+                    image_path=f"static/{items_dict[str(ObjectId(item))]['name']}.jpg")
+            for item in search_vector
+            if str(ObjectId(item)) in items_dict  # Only add if item exists in MongoDB
+        ]
+
         return search_result
 
     def web_search(self, item_id: ObjectId):
