@@ -44,7 +44,7 @@ class SimilarService:
             item_detail = self.mongo.find_one(collection="items", query={"_id": ObjectId(item["_id"])})
             item_detail["image_path"] = f"static/{item_detail['name']}.jpg"
             # Append item details
-            items_details.append({"item": GetItem(**item_detail)})
+            items_details.append(GetItem(**item_detail))
 
         return items_details
 
