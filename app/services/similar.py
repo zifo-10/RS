@@ -38,11 +38,15 @@ class SimilarService:
 
         # Run the aggregation
         related_items = list(self.mongo.aggregate(collection="transactions", pipeline=pipeline))
-        for item in related_items:
-            item["_id"] = str(item["_id"])
-        return related_items
 
-    def search(self, query: SimilaritySearch):
+        items_details = []
+        for item in related_items:
+            item_detail = self.mongo.find_one(collection="items", query={"_id": ObjectId(item["_id"])})
+            item_detail["image_path"] = f"static/{item_detail['name']}.jpg"
+            items_details.append({"item": GetItem(**item_detail), "count": item["count"]})
+        return items_details
+
+    def search(self, query: SimilaritySearch) -> list[GetItem]:
         # Define the search query
         embedding = self.cohere.embed_text(texts=[query.query],
                                            model="embed-multilingual-light-v3.0",
@@ -51,15 +55,16 @@ class SimilarService:
         search_vector = self.vectordb.search_vector(query_vector=embedding,
                                                     collection_name="items",
                                                     top_k=query.limit,
-                                                    filters=query.filters)
+                                                    filters=query.filters,
+                                                    score_threshold=query.score_threshold)
         search_result = []
         for item in search_vector:
-            item = GetItem(**self.mongo.find_one(collection="items", query={"_id": ObjectId(item)})).model_dump()
+            item = self.mongo.find_one(collection="items", query={"_id": ObjectId(item)})
             item["image_path"] = f"static/{item['name']}.jpg"
-            search_result.append(item)
+            search_result.append(GetItem(**item))
         return search_result
 
     def web_search(self, item_id: ObjectId):
-        item = GetItem(**self.mongo.find_one(collection="items", query={"_id": item_id}))
-        web_search_results = self.web_search_service.search(f"{item.name}")
+        item = self.mongo.find_one(collection="items", query={"_id": item_id})
+        web_search_results = self.web_search_service.search(f"{item['name']}")
         return web_search_results

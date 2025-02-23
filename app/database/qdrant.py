@@ -1,6 +1,7 @@
 import uuid
-from qdrant_client import models
+
 from qdrant_client import QdrantClient
+from qdrant_client import models
 from qdrant_client.models import PointStruct
 
 
@@ -18,7 +19,9 @@ class VectorDBClient:
         )
         return point_id
 
-    def search_vector(self, query_vector: list, collection_name: str, top_k: int, filters: dict = None):
+    def search_vector(self, query_vector: list, collection_name: str,
+                      score_threshold: float, top_k: int,
+                      filters: dict = None):
         must = []
         if filters:
             for key, value in filters.items():
@@ -38,7 +41,7 @@ class VectorDBClient:
                 must=must
             ),
             search_params=models.SearchParams(exact=True),
-            score_threshold=0.0
+            score_threshold=score_threshold
         )
         # Sort results by the score in descending order
         sorted_results = sorted(results, key=lambda x: x.score, reverse=True)
@@ -49,4 +52,3 @@ class VectorDBClient:
             ids_list.append(mongo_id)
 
         return ids_list
-

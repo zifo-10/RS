@@ -1,5 +1,4 @@
 from bson import ObjectId
-from typing_extensions import Dict
 
 from app.core.embed import CohereClient
 from app.database.mongo import Mongo
@@ -49,5 +48,6 @@ class InsertService:
         :return: The retrieved item.
         """
         # Retrieve the item from the database
-        item = GetItem(**self.mongo.find_one(collection="items", query={"_id": item_id}))
-        return item
+        item = self.mongo.find_one(collection="items", query={"_id": item_id})
+        item["image_path"] = f"/static/{item['name']}.jpg"
+        return GetItem(**item)
