@@ -7,6 +7,9 @@ class Item(BaseModel):
     description: str
     color: str
     price: float
+    material: str
+    related_items: list
+    category: str
 
 
 class GetItem(Item):

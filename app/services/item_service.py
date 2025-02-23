@@ -32,6 +32,8 @@ class InsertService:
         self.vectordb.insert_vector(vector=embedding,
                                     payload={"id": str(result.inserted_id),
                                              "color": data.color,
+                                             "material": data.material,
+                                             "category": data.category,
                                              "price": data.price},
                                     collection_name="items")
         return str(result.inserted_id)
