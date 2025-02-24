@@ -15,5 +15,5 @@ class Item(BaseModel):
 
 class GetItem(Item):
     id: MongoObjectId = Field(alias="_id")
-    image_path: str
+    image: bytes
 

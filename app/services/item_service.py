@@ -1,3 +1,6 @@
+import base64
+import os
+
 from bson import ObjectId
 
 from app.core.embed import CohereClient
@@ -6,7 +9,7 @@ from app.database.qdrant import VectorDBClient
 from app.models.item import Item, GetItem
 
 
-class InsertService:
+class ItemService:
     def __init__(self, mongo: Mongo, cohere: CohereClient, vectordb: VectorDBClient):
         self.mongo = mongo
         self.cohere = cohere
@@ -49,6 +52,21 @@ class InsertService:
                                     collection_name="items_en")
         return str(result.inserted_id)
 
+    @staticmethod
+    def read_image(image_name: str):
+        """Search for an image file in STATIC_FOLDER with any extension."""
+        for file in os.listdir('static'):
+            if file.startswith(image_name + "."):
+                image_path = os.path.join('static', file)
+                # Read image bytes
+                if image_path:
+                    with open(image_path, "rb") as img_file:
+                        image_bytes = img_file.read()
+                else:
+                    image_bytes = None
+                encoded_images = base64.b64encode(image_bytes).decode("utf-8")
+                return encoded_images
+
     def get_item(self, item_id: ObjectId) -> GetItem:
         """
         Get the item from the MongoDB database.
@@ -60,5 +78,23 @@ class InsertService:
         """
         # Retrieve the item from the database
         item = self.mongo.find_one(collection="items", query={"_id": item_id})
-        item["image_path"] = f"/static/{item['name']}.jpg"
+        # Add image bytes to response
+        item["image"] = self.read_image(item["name"])
         return GetItem(**item)
+
+    def get_items(self, items_ids: list[ObjectId]) -> list[GetItem]:
+        """
+        Get the items from the MongoDB database.
+
+        This method retrieves the items with the provided IDs from the MongoDB database.
+
+        :param items_ids: The IDs of the items to retrieve.
+        :return: The retrieved items.
+        """
+        # Retrieve the items from the database
+        items = self.mongo.find_many(collection="items", query={"_id": {"$in": items_ids}})
+        # Add image bytes to response
+        for item in items:
+            item["image"] = self.read_image(item["name"])
+        return [GetItem(**item) for item in items]
+
