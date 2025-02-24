@@ -6,14 +6,18 @@ from app.database.mongo import Mongo
 from app.database.qdrant import VectorDBClient
 from app.models.item import GetItem
 from app.models.similarity_search import SimilaritySearch
+from app.services.item_service import ItemService
 
 
 class SimilarService:
-    def __init__(self, mongo: Mongo, cohere: CohereClient, vectordb: VectorDBClient, web_search_service: WebSearch):
+    def __init__(self, mongo: Mongo, cohere: CohereClient,
+                 vectordb: VectorDBClient, web_search_service: WebSearch,
+                 item_service: ItemService):
         self.mongo = mongo
         self.cohere = cohere
         self.vectordb = vectordb
         self.web_search_service = web_search_service
+        self.item_service = item_service
 
     def get_related_transaction(self, item_id: ObjectId):
         pipeline = [
@@ -41,11 +45,8 @@ class SimilarService:
 
         items_details = []
         for item in related_items:
-            item_detail = self.mongo.find_one(collection="items", query={"_id": ObjectId(item["_id"])})
-            item_detail["image_path"] = f"static/{item_detail['name']}.jpg"
-            # Append item details
-            items_details.append(GetItem(**item_detail))
-
+            item_details = self.item_service.get_item(item["_id"])
+            items_details.append(item_details)
         return items_details
 
     def search(self, query: SimilaritySearch) -> list[GetItem]:
@@ -77,20 +78,9 @@ class SimilarService:
         ids_to_search = [ObjectId(item) for item in search_vector]
 
         # Fetch the items from MongoDB in bulk using $in to get the documents
-        items = self.mongo.find_many(collection="items", query={"_id": {"$in": ids_to_search}})
+        items = self.item_service.get_items(ids_to_search)
 
-        # Create a dictionary to map Mongo documents by their _id for quick access
-        items_dict = {str(item["_id"]): item for item in items}
-
-        # Prepare the result list, preserving the order of search_vector
-        search_result = [
-            GetItem(**items_dict[str(item)],
-                    image_path=f"static/{items_dict[str(item)]['name']}.jpg")
-            for item in search_vector
-            if str(item) in items_dict  # Only add if item exists in MongoDB
-        ]
-
-        return search_result
+        return items
 
     def web_search(self, item_id: ObjectId):
         item = self.mongo.find_one(collection="items", query={"_id": item_id})
