@@ -3,7 +3,7 @@ from app.core.embed import CohereClient
 from app.core.web_search import WebSearch
 from app.database.mongo import Mongo
 from app.database.qdrant import VectorDBClient
-from app.services.item_service import InsertService
+from app.services.item_service import ItemService
 from app.services.similar import SimilarService
 from app.services.transaction_service import TransactionService
 
@@ -25,10 +25,10 @@ def get_web_search_service():
     return WebSearch(api_key=config.TAVILYAPI_KEY)
 
 
-def insert_service():
-    return InsertService(mongo=get_mongo_client(),
-                         cohere=get_cohere_client(),
-                         vectordb=get_qdrant_client())
+def item_service():
+    return ItemService(mongo=get_mongo_client(),
+                       cohere=get_cohere_client(),
+                       vectordb=get_qdrant_client())
 
 
 def transaction_service():
@@ -39,4 +39,5 @@ def similar_service():
     return SimilarService(mongo=get_mongo_client(),
                           cohere=get_cohere_client(),
                           vectordb=get_qdrant_client(),
-                          web_search_service=get_web_search_service())
+                          web_search_service=get_web_search_service(),
+                          item_service=item_service())
