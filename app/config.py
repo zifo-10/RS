@@ -12,6 +12,7 @@ class Config(BaseSettings):
     COHERE_API_KEY: str
     MONGO_DB_NAME: str
     TAVILYAPI_KEY: str
+    OPEN_AI_API: str
 
     class Config:
         env_file = ".env"
