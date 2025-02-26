@@ -27,7 +27,7 @@ class SimilarService:
         mongo_search_result = self.mongo.full_text_search(collection="items", query=query, filter=filter)
         result_list = []
         for item in mongo_search_result:
-            # item["image"] = self.item_service.read_image(item["name_en"])
+            item["image"] = self.item_service.read_image(item["name_en"])
             item = GetItem(**item)
             result_list.append(item)
         return result_list

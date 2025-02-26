@@ -200,4 +200,9 @@ class ItemService:
 
         items = self.mongo.aggregate(collection="items", pipeline=pipeline)
 
-        return [GetItem(**item) for item in items]
+        result_list = []
+        for item in items:
+            item["image"] = self.read_image(item["name_en"])
+            item = GetItem(**item)
+            result_list.append(item)
+        return result_list
