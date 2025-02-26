@@ -9,6 +9,13 @@ class VectorDBClient:
     def __init__(self, host: str, port: int):
         self.client = QdrantClient(url=host, port=port)
 
+    def create_collection(self):
+        self.client.create_collection(
+            collection_name="items_en",
+            vectors_config=models.VectorParams(
+                size=384,
+                distance=models.Distance.COSINE),
+        )
     def insert_vector(self, vector: list, payload: dict, collection_name: str):
         point_id = str(uuid.uuid4())
         self.client.upsert(
@@ -52,3 +59,6 @@ class VectorDBClient:
             ids_list.append(mongo_id)
 
         return ids_list
+
+
+# VectorDBClient(host="http://172.105.247.6", port=6333).create_collection()

@@ -9,6 +9,8 @@ class CohereClient:
         """
         self.client = cohere.Client(api_key=api_key)
 
+
+
     def embed_text(self, texts, model, input_type, embedding_types) -> list:
         """
         Embed a list of texts using the specified model and input type.

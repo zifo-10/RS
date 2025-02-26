@@ -18,3 +18,13 @@ class Mongo:
 
     def find_many(self, collection: str, query: dict) -> list:
         return list(self.db[collection].find(query))
+
+    def full_text_search(self, collection: str, query: str, filter: dict = None) -> list:
+        # Merge the query with the filter dictionary if filter is provided
+        query_dict = {"$text": {"$search": query}}
+
+        if filter:
+            query_dict.update(filter)  # Merge filter into query_dict
+
+        # Perform the search
+        return list(self.db[collection].find(query_dict))
