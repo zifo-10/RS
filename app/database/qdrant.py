@@ -11,7 +11,7 @@ class VectorDBClient:
 
     def create_collection(self):
         self.client.create_collection(
-            collection_name="items_en",
+            collection_name="items_ar",
             vectors_config=models.VectorParams(
                 size=384,
                 distance=models.Distance.COSINE),
@@ -52,7 +52,6 @@ class VectorDBClient:
         )
         # Sort results by the score in descending order
         sorted_results = sorted(results, key=lambda x: x.score, reverse=True)
-
         ids_list = []
         for result in sorted_results:
             mongo_id = result.model_dump()['payload']['id']

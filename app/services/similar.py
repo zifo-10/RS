@@ -27,7 +27,7 @@ class SimilarService:
         mongo_search_result = self.mongo.full_text_search(collection="items", query=query, filter=filter)
         result_list = []
         for item in mongo_search_result:
-            item["image"] = self.item_service.read_image(item["name_en"])
+            # item["image"] = self.item_service.read_image(item["name_en"])
             item = GetItem(**item)
             result_list.append(item)
         return result_list
@@ -53,11 +53,11 @@ class SimilarService:
             if is_arabic:
                 # Arabic query: use Arabic fields
                 document_text = (f"name: {doc.name_ar} description: {doc.description_ar} "
-                                 f"color: {doc.color} material: {doc.material}")
+                                 f"color: {doc.color_ar}")
             else:
                 # English query: use English fields
                 document_text = (f"name: {doc.name_en} description: {doc.description_en} "
-                                 f"color: {doc.color} material: {doc.material}")
+                                 f"color: {doc.color_en}")
 
             # Generate the embedding for the document text
             document_embedding = self.generate_embedding(document_text)

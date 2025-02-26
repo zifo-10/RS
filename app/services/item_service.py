@@ -10,105 +10,65 @@ from app.database.qdrant import VectorDBClient
 from app.models.item import Item, GetItem
 
 products = [
-    # Similar Nails (مسامير)
     {
-        "name_ar": "مسمار حديدي",
-        "name_en": "Iron Nail",
-        "description_ar": "مسمار مصنوع من الحديد، يستخدم في تثبيت الأخشاب والمواد المختلفة.",
-        "description_en": "An iron nail used for fastening wood and other materials.",
-        "color": "gray",
-        "material": "iron",
-        "price": 5.00,  # price in EGP
+        "name_ar": "لباس سلامة",
+        "name_en": "Safety Vest",
+        "description_ar": "لباس يعكس الضوء يستخدم في مواقع البناء لضمان السلامة.",
+        "description_en": "A reflective vest used at construction sites for safety.",
+        "color_en": "orange",
+        "color_ar": "برتقالي",
+        "material": "polyester",
+        "price": 75.00
     },
     {
-        "name_ar": "مسمار فولاذي",
-        "name_en": "Steel Nail",
-        "description_ar": "مسمار فولاذي مقاوم للصدأ، مثالي للبناء والتشطيبات.",
-        "description_en": "A stainless steel nail, ideal for construction and finishing.",
-        "color": "silver",
-        "material": "steel",
-        "price": 6.50,  # price in EGP
+        "name_ar": "خوذة أمان",
+        "name_en": "Safety Helmet",
+        "description_ar": "خوذة واقية للرأس تستخدم في مواقع البناء لحماية العمال.",
+        "description_en": "A protective helmet used at construction sites to protect workers.",
+        "color_en": "yellow",
+        "color_ar": "أصفر",
+        "material": "hard plastic",
+        "price": 120.00
     },
     {
-        "name_ar": "مسمار سقف",
-        "name_en": "Roofing Nail",
-        "description_ar": "مسمار ذو رأس عريض يستخدم في تثبيت ألواح الأسقف.",
-        "description_en": "A nail with a wide head used for securing roofing sheets.",
-        "color": "black",
-        "material": "steel",
-        "price": 7.00,  # price in EGP
+        "name_ar": "نظارات حماية",
+        "name_en": "Safety Glasses",
+        "description_ar": "نظارات واقية تستخدم لحماية العينين أثناء العمل.",
+        "description_en": "Protective glasses used to shield the eyes while working.",
+        "color_en": "clear",
+        "color_ar": "شفاف",
+        "material": "plastic",
+        "price": 60.00
     },
     {
-        "name_ar": "مسمار خرساني",
-        "name_en": "Concrete Nail",
-        "description_ar": "مسمار شديد الصلابة يستخدم في تثبيت المواد في الخرسانة.",
-        "description_en": "An extremely tough nail used for securing materials into concrete.",
-        "color": "gray",
-        "material": "steel",
-        "price": 8.00,  # price in EGP
-    },
-    {
-        "name_ar": "رمل بناء",
-        "name_en": "Construction Sand",
-        "description_ar": "رمل ناعم يستخدم في أعمال البناء والخرسانة لتوفير متانة وقوة إضافية.",
-        "description_en": "Fine sand used in construction and concrete work to provide additional durability and strength.",
-        "color": "yellow",
-        "material": "sand",
-        "price": 20.00,  # price in EGP
-    },
-    {
-        "name_ar": "زلط ناعم",
-        "name_en": "Fine Gravel",
-        "description_ar": "زلط ناعم يستخدم في الخرسانة الخفيفة وأعمال التشطيب.",
-        "description_en": "Fine gravel used in lightweight concrete and finishing work.",
-        "color": "gray",
-        "material": "gravel",
-        "price": 15.00,  # price in EGP
-    },
-    {
-        "name_ar": "زلط خشن",
-        "name_en": "Coarse Gravel",
-        "description_ar": "زلط بحجم كبير يستخدم في الخرسانة الثقيلة وأساسات البناء.",
-        "description_en": "Large-sized gravel used in heavy concrete and building foundations.",
-        "color": "gray",
-        "material": "gravel",
-        "price": 18.00,  # price in EGP
-    },
-    {
-        "name_ar": "مطرقة يدوية",
-        "name_en": "Hand Hammer",
-        "description_ar": "مطرقة يدوية متعددة الاستخدامات مصنوعة من الفولاذ مع مقبض خشبي.",
-        "description_en": "A versatile hand hammer made of steel with a wooden handle.",
-        "color": "silver",
-        "material": "steel, Wood",
-        "price": 30.00,  # price in EGP
-    },
-    {
-        "name_ar": "مطرقة مطاطية",
-        "name_en": "Rubber Mallet",
-        "description_ar": "مطرقة ذات رأس مطاطي تستخدم في الأعمال التي تحتاج إلى ضربات غير مؤذية.",
-        "description_en": "A hammer with a rubber head used for non-damaging strikes.",
-        "color": "black",
+        "name_ar": "قفازات عازلة",
+        "name_en": "Insulated Gloves",
+        "description_ar": "قفازات توفر الحماية ضد الكهرباء والمواد الكيميائية.",
+        "description_en": "Gloves that provide protection against electricity and chemicals.",
+        "color_en": "yellow",
+        "color_ar": "أصفر",
         "material": "rubber",
-        "price": 25.00,  # price in EGP
+        "price": 90.00
     },
     {
-        "name_ar": "إسمنت",
-        "name_en": "Cement",
-        "description_ar": "مادة رابطة تستخدم في البناء لربط المواد معًا وتشكيل الخرسانة.",
-        "description_en": "A binding material used in construction to hold materials together and form concrete.",
-        "color": "gray",
-        "material": "cement",
-        "price": 50.00,  # price in EGP
+        "name_ar": "أشرطة قياس",
+        "name_en": "Measuring Tape",
+        "description_ar": "شريط مرن يستخدم لقياس المسافات بدقة.",
+        "description_en": "A flexible tape used for accurately measuring distances.",
+        "color_en": "yellow",
+        "color_ar": "أصفر",
+        "material": "metal, plastic",
+        "price": 50.00
     },
     {
-        "name_ar": "طوب",
-        "name_en": "Bricks",
-        "description_ar": "وحدات بناء مصنوعة من الطين أو الخرسانة تستخدم في تشييد الجدران والمباني.",
-        "description_en": "Building units made of clay or concrete used for constructing walls and buildings.",
-        "color": "red",
-        "material": "clay",
-        "price": 3.00,  # price in EGP
+        "name_ar": "مرشح هواء صناعي",
+        "name_en": "Industrial Air Filter",
+        "description_ar": "مرشح يستخدم لتنقية الهواء من الغبار والملوثات في مواقع العمل.",
+        "description_en": "A filter used to purify air from dust and pollutants at work sites.",
+        "color_en": "white",
+        "color_ar": "أبيض",
+        "material": "synthetic fibers",
+        "price": 500.00
     }
 ]
 
@@ -202,7 +162,7 @@ class ItemService:
 
         result_list = []
         for item in items:
-            item["image"] = self.read_image(item["name_en"])
+            # item["image"] = self.read_image(item["name_en"])
             item = GetItem(**item)
             result_list.append(item)
         return result_list
