@@ -26,7 +26,7 @@ def search_items(query: SimilaritySearch) -> dict[str, list[GetItem] | list[Any]
 @router.get("/related_transaction/{item_id}")
 async def get_related_items(item_id: PyObjectId) -> Dict[str, List]:
     related_items = similar_service().get_related_transaction(item_id)
-    return {"items": related_items}
+    return {"results": related_items}
 
 
 @router.get("/web_search/{item_id}")
