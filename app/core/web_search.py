@@ -40,7 +40,7 @@ class WebSearch:
 
             # Return the filtered response
             return {
-                "items": web_search_results,
+                "results": web_search_results,
                 "images": response['images']
             }
         except Exception as e:
