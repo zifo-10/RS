@@ -13,7 +13,7 @@ router = APIRouter()
 @router.post("/items/")
 async def create_item(item: Item) -> Dict[str, str]:
     # Insert item into MongoDB
-    inserted_id = item_service().insert()
+    inserted_id = item_service().insert(item)
     return {"item_id": str(inserted_id)}
 
 

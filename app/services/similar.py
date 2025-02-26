@@ -1,7 +1,6 @@
 from typing import Any
 
 from bson import ObjectId
-from dns.e164 import query
 from scipy.spatial.distance import cosine
 
 from app.clean_text import clean_arabic_text
@@ -145,8 +144,8 @@ class SimilarService:
             similar_result = [item for item in similar_result if item not in reranked_documents]
 
         results = {
-            "full_text_search_results": reranked_documents,
-            "similar_result": similar_result
+            "results": reranked_documents,
+            "related_results": similar_result
         }
         return results
 

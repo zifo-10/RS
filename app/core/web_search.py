@@ -27,8 +27,6 @@ class WebSearch:
                                           max_results=10,
                                           include_images=True,
                                           include_domains=["amazon.com"], )
-            print(response['images'])
-            print(len(response['images']))
             web_search_results = []
             for item in response['results']:
                 # Only include URLs that are product pages (contains '/dp/')

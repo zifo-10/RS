@@ -112,13 +112,14 @@ products = [
     }
 ]
 
+
 class ItemService:
     def __init__(self, mongo: Mongo, cohere: CohereClient, vectordb: VectorDBClient):
         self.mongo = mongo
         self.cohere = cohere
         self.vectordb = vectordb
 
-    def insert(self) -> str:
+    def insert(self, data: Item) -> str:
         """
         Insert the provided data into the MongoDB database.
 
