@@ -151,6 +151,6 @@ class SimilarService:
 
     def web_search(self, item_id: ObjectId) -> dict[str, list[dict[str, Any]] | Any]:
         item = GetItem(**self.mongo.find_one(collection="items", query={"_id": item_id}))
-        query_en = f"{item.name_en} {item.color}"
+        query_en = f"{item.name_en} {item.color_en}"
         web_search_results_en = self.web_search_service.search(query_en)
         return web_search_results_en
