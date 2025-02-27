@@ -166,3 +166,16 @@ class ItemService:
             item = GetItem(**item)
             result_list.append(item)
         return result_list
+
+    def get_prompt(self, prompt_id: ObjectId) -> dict:
+        """
+        Get the prompt from the MongoDB database.
+
+        This method retrieves the prompt with the provided ID from the MongoDB database.
+
+        :param prompt_id: The ID of the prompt to retrieve.
+        :return: The retrieved prompt.
+        """
+        # Retrieve the prompt from the database
+        prompt = self.mongo.find_one(collection="prompts", query={"_id": prompt_id})
+        return prompt

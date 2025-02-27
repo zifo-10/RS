@@ -30,7 +30,8 @@ def get_mongo_client():
 def get_llm_service():
     return LLMService(llm=LLM(api_key=config.OPEN_AI_API),
                       search_service=similar_service(),
-                      web_search_service=get_web_search_service())
+                      web_search_service=get_web_search_service(),
+                      item_service=item_service())
 
 
 def get_web_search_service():
