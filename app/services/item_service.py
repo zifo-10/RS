@@ -163,7 +163,7 @@ class ItemService:
 
         result_list = []
         for item in items:
-            # item["image"] = self.read_image(item["name_en"])
+            item["image"] = self.read_image(item["name_en"])
             item = GetItem(**item)
             result_list.append(item)
         return result_list
