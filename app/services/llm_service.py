@@ -67,10 +67,10 @@ class LLMService:
             conversation_id = self.item_service.create_conversation()
         chat_history = self.item_service.get_messages(ObjectId(conversation_id))
         new_query = query + " " + chat_history[0].question if chat_history else query
-        lang = "en"
+        lang = "English"
         if '\u0600' <= query[0] <= '\u06FF' or '\u0750' <= query[0] <= '\u077F' or '\u08A0' <= query[
             0] <= '\u08FF':
-            lang = "ar"
+            lang = "Arabic"
         # Retrieve knowledge base results
         knowledge_base = self.search_items(
             query=SimilaritySearch(query=new_query, limit=limit, score_threshold=score_threshold, filters=filters)
