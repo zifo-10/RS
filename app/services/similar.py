@@ -139,7 +139,6 @@ class SimilarService:
             new_limit = query.limit - len(full_text_search_results)
             query.limit = new_limit
             similar_result = self.similarity_search(query, is_arabic)
-
             # Remove items in reranked_documents from similar_result
             similar_result = [item for item in similar_result if item not in reranked_documents]
 

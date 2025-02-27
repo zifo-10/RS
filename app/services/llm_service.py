@@ -63,11 +63,14 @@ class LLMService:
             conversation_id: Optional[str] = None,
             search: bool = True
     ):
+        # Remove space form query if it is the first letter
+        query = query.strip()
         if not conversation_id:
             conversation_id = self.item_service.create_conversation()
         chat_history = self.item_service.get_messages(ObjectId(conversation_id))
         new_query = query + " " + chat_history[0].question if chat_history else query
         lang = "English"
+
         if '\u0600' <= query[0] <= '\u06FF' or '\u0750' <= query[0] <= '\u077F' or '\u08A0' <= query[
             0] <= '\u08FF':
             lang = "Arabic"
@@ -75,7 +78,6 @@ class LLMService:
         knowledge_base = self.search_items(
             query=SimilaritySearch(query=new_query, limit=limit, score_threshold=score_threshold, filters=filters)
         )
-        print("knowledge_base***************", knowledge_base)
         web_search_results = self.web_search_service.search(query) if search else {"results": []}
         # Generate system and user messages
         prompt = Prompt(**self.item_service.get_prompt(prompt_id=ObjectId("67c045cf1eb68369147527c0")))
