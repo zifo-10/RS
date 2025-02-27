@@ -15,7 +15,8 @@ def chat(chat_request: Chat):
         query=chat_request.query,
         score_threshold=chat_request.score_threshold,
         filters=chat_request.filters,
-        search=chat_request.search
+        search=chat_request.search,
+        conversation_id=chat_request.conversation_id
     )
     return answer
 

@@ -8,6 +8,7 @@ from app.core.embed import CohereClient
 from app.database.mongo import Mongo
 from app.database.qdrant import VectorDBClient
 from app.models.item import Item, GetItem
+from app.models.message import Message
 
 products = [
     {
@@ -179,3 +180,47 @@ class ItemService:
         # Retrieve the prompt from the database
         prompt = self.mongo.find_one(collection="prompts", query={"_id": prompt_id})
         return prompt
+
+    def add_message(self, question: str, answer: str, conversation_id: ObjectId):
+        """
+        Add a question and answer pair to the MongoDB database.
+
+        This method adds a question and answer pair to the MongoDB database.
+
+        :param question: The question to add.
+        :param answer: The answer to add.
+        :param conversation_id: The ID of the conversation to which the question and answer belong.
+        """
+        data = {"question": question,
+                "answer": answer,
+                "conversation_id": ObjectId(conversation_id)}
+        self.mongo.insert(collection="messages", data=data)
+
+    def get_messages(self, conversation_id: ObjectId) -> list[Message]:
+        """
+        Get all messages from the MongoDB database.
+
+        This method retrieves all messages from the MongoDB database.
+
+        :return: A list of all messages.
+        """
+        # Retrieve all messages in reverse order
+        list_messages = []
+        messages = self.mongo.get_messages(collection="messages",
+                                             query={"conversation_id": ObjectId(conversation_id)},
+                                             limit=10)
+        for message in messages:
+            list_messages.append(Message(**message))
+        return list_messages
+
+    def create_conversation(self) -> str:
+        """
+        Create a new conversation in the MongoDB database.
+
+        This method creates a new conversation in the MongoDB database and returns the conversation ID.
+
+        :return: The ID of the created conversation.
+        """
+        # Create a new conversation in the database
+        conversation_id = self.mongo.insert(collection="conversations", data={})
+        return conversation_id.inserted_id

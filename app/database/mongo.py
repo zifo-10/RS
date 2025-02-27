@@ -28,3 +28,8 @@ class Mongo:
 
         # Perform the search
         return list(self.db[collection].find(query_dict))
+
+    def get_messages(self, collection: str, query: dict, limit: int) -> list:
+        return list(
+            self.db[collection].find(query).sort("created_at", -1).limit(limit)
+        )

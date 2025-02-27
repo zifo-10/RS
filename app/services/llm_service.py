@@ -34,15 +34,16 @@ class LLMService:
         """Generates the system instruction for the AI model."""
         return system
 
-
     def _generate_user_message(
             self, query: str, full_text_search_result: list, similar_items: list,
             lang: str, user: str,
+            chat_history: Optional[list] = None,
             web_search_result: Optional[list] = None
     ) -> str:
         """Creates a user message prompt for the AI model."""
-        formated_user = (user.replace("{query}",query)
+        formated_user = (user.replace("{query}", query)
                          .replace("{lang}", lang)
+                         .replace("{chat_history}", str(chat_history))
                          .replace("{full_text_search_result}", str(full_text_search_result))
                          .replace("{similar_items}", str(similar_items))
                          .replace("{web_search_result}", str(web_search_result)))
@@ -50,15 +51,20 @@ class LLMService:
 
     def chat(
             self, query: str, limit: int = 10, score_threshold: float = 0.3, filters: Optional[dict] = None,
+            conversation_id: Optional[str] = None,
             search: bool = True
     ):
+        if not conversation_id:
+            conversation_id = self.item_service.create_conversation()
+        chat_history = self.item_service.get_messages(ObjectId(conversation_id))
+        new_query = query + " " + chat_history[0].question if chat_history else query
         lang = "en"
         if '\u0600' <= query[0] <= '\u06FF' or '\u0750' <= query[0] <= '\u077F' or '\u08A0' <= query[
             0] <= '\u08FF':
             lang = "ar"
         # Retrieve knowledge base results
         knowledge_base = self.search_items(
-            query=SimilaritySearch(query=query, limit=limit, score_threshold=score_threshold, filters=filters)
+            query=SimilaritySearch(query=new_query, limit=limit, score_threshold=score_threshold, filters=filters)
         )
         web_search_results = self.web_search_service.search(query) if search else {"results": []}
         # Generate system and user messages
@@ -66,6 +72,7 @@ class LLMService:
         system_message = self._generate_system_message(prompt.system)
         user_message = self._generate_user_message(
             query=query,
+            chat_history=chat_history,
             full_text_search_result=knowledge_base["results"],
             similar_items=knowledge_base["related_results"],
             web_search_result=web_search_results["results"],
@@ -74,4 +81,9 @@ class LLMService:
         )
         # Stream the AI's response
         answer = self.generate_response(system=system_message, user=user_message)
-        return answer
+        self.item_service.add_message(question=query, answer=answer.answer, conversation_id=ObjectId(conversation_id))
+        return {
+            "answer": answer.answer,
+            "item_id": answer.item_id,
+            "conversation_id": str(conversation_id),
+        }

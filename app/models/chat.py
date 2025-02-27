@@ -9,3 +9,4 @@ class Chat(BaseModel):
     score_threshold: Optional[float] = Field(description="The minimum score threshold for search results.", default=0.3)
     filters: Optional[dict] = Field(description="The filters to apply to the search results.", default=None)
     search: Optional[bool] = Field(description="Whether to perform a web search.", default=False)
+    conversation_id: Optional[str] = Field(description="The conversation ID to track the chat history.", default=None)
