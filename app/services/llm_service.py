@@ -28,7 +28,16 @@ class LLMService:
 
     def search_items(self, query: SimilaritySearch) -> dict:
         """Searches for similar items and returns search results."""
-        return self.search_service.search(query)
+        result = self.search_service.search(query)
+
+        # Use list comprehension to extract results and exclude the 'image' field
+        full_text_results = [item.model_dump(exclude={'image'}) for item in result["results"]]
+        similar_items = [item.model_dump(exclude={'image'}) for item in result["related_results"]]
+
+        return {
+            "results": full_text_results,
+            "related_results": similar_items
+        }
 
     def _generate_system_message(self, system) -> str:
         """Generates the system instruction for the AI model."""
@@ -66,6 +75,7 @@ class LLMService:
         knowledge_base = self.search_items(
             query=SimilaritySearch(query=new_query, limit=limit, score_threshold=score_threshold, filters=filters)
         )
+        print("knowledge_base***************", knowledge_base)
         web_search_results = self.web_search_service.search(query) if search else {"results": []}
         # Generate system and user messages
         prompt = Prompt(**self.item_service.get_prompt(prompt_id=ObjectId("67c045cf1eb68369147527c0")))
